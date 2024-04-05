@@ -1,9 +1,8 @@
 import logging.config
 
 from aiohttp import web
-from background import Background
-
-# import views
+from wallet_api.background import Background
+from wallet_api.endpoints import handle_transactions
 
 log = logging.getLogger(__name__)
 
@@ -13,7 +12,7 @@ async def background_task(app):
     This func yields twice, first time when running app,
     second time on shutdown. Cancels update_state before shutdown.
     """
-    await app["background"].start()
+    app["background"].start()
     log.info("Background task started.")
     yield
     await app["background"].stop()
@@ -24,8 +23,7 @@ app = web.Application()
 app["background"] = Background()
 
 app.add_routes([
-    # web.get("/", views.get_all_replicas_per_dns),
-    # web.get("/is_alive", views.liveness_probe),
+    web.post("/transaction", handle_transactions),
     # web.get("/is_ready", views.readiness_probe),
     # web.get("/{dns}", views.get_fastest_replica_per_dns),
 ])
