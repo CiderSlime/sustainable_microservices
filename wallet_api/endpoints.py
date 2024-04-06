@@ -1,3 +1,5 @@
+import asyncio
+
 from aiohttp import web
 from wallet_api.helpers import prepare_batch
 import logging
@@ -17,9 +19,10 @@ async def handle_transactions(request):
 
     background = request.config_dict["background"]
 
-    background.batches += batches
-    # potentially heavy operation, consider to use different prioritization or
-    # an external batches storage
-    background.batches.sort(key=lambda x: x["total_value"])
+    asyncio.ensure_future(background.add_batches(batches))
 
     return web.Response(status=200)
+
+
+async def get_customer(request):
+    pass

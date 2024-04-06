@@ -5,7 +5,6 @@ from uuid import uuid4
 from aiohttp.web_runner import GracefulExit
 from wallet_api.constants import (
     PROCESSOR_MAX_WORKERS,
-    BACKGROUND_TIME_INTERVAL_SECONDS
 )
 
 log = logging.getLogger(__name__)
@@ -16,44 +15,25 @@ class Background:
         self.batches = list()
         self.tasks = dict()
         self.main_task = None
+        self.transferring_batches_count = 0
 
-    async def send_transactions(
-        self,
-        # transaction, transaction_id
-    ):
-        while True:
-            try:
-                while self.batches:
-                    # transaction_id = uuid4()
-                    # send request, write result
-                    batch = self.batches.pop()
-                    log.debug(f"Sending batch {batch}")
-                    # self.tasks[transaction_id] = asyncio.create_task(
-                    #     self.send(transaction, transaction_id)
-                    # )
+    async def add_batches(self, new_batches):
+        self.batches = sorted(self.batches + new_batches, key=lambda x: x["total_value"])
+        await self.handle_next_batch()
 
-                await asyncio.sleep(BACKGROUND_TIME_INTERVAL_SECONDS)
+    async def handle_next_batch(self):
+        if self.transferring_batches_count < PROCESSOR_MAX_WORKERS and len(self.batches):
+            await self.send_batch(self.batches.pop())
 
-            except asyncio.CancelledError:
-                # await self.close_pool()
-                log.debug(f"Main task successfully cancelled.")
-                raise asyncio.CancelledError
+    async def send_batch(self, batch):
+        self.transferring_batches_count += 1
+        log.debug(f"Sending batch {batch}")
+        self.transferring_batches_count -= 1
+        await self.handle_next_batch()
 
-            except Exception as e:
-                log.exception(e)
-                raise GracefulExit()
-
-    async def stop(self):
-        tasks = [self.main_task, *self.tasks.values()]
+    async def teardown(self):
+        tasks = self.tasks.values()
         for t in tasks:
             t.cancel()
 
         await asyncio.gather(*tasks)
-
-    def start(self):
-        try:
-            self.main_task = asyncio.create_task(self.send_transactions())
-
-        except Exception as e:
-            log.exception(e)
-            raise GracefulExit()
