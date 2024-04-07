@@ -9,9 +9,9 @@ from sqlalchemy import (
     ForeignKey,
     Enum,
     Date,
-    Double
+    Double,
 )
-from sqlalchemy.orm import declarative_base, mapped_column, relationship
+from sqlalchemy.orm import declarative_base, relationship
 
 Base = declarative_base()
 
@@ -24,6 +24,15 @@ class Transaction(Base):
     latency = Column(Integer, nullable=False)
     customer_id = Column(UUID, ForeignKey("customers.uid"), nullable=False)
     status = Column(String, nullable=False)
+
+
+class CreditCard:
+    __tablename__ = "credit_cards"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    balance = Column(Double, nullable=False)
+    cc_number = Column(String)
+    customers = relationship("Customer", back_populates="credit_card")
 
 
 class Customer(Base):
@@ -42,7 +51,8 @@ class Customer(Base):
     email = Column(String)
     balance = Column(Double, nullable=False)
     # employment = Column(Integer, ForeignKey("employments.id"))
-    # credit_card = Column(Integer, ForeignKey("credit_cards.id"), nullable=False)
+    # credit_card_id = Column(Double, ForeignKey("public.credit_card.id"), nullable=False)
+    # credit_card = relationship("CreditCard", back_populates="customers")
     # address = Column(Integer, ForeignKey("addresses.id"))
     created_at = Column(Date, nullable=False, default=datetime.utcnow)
     updated_at = Column(Date, nullable=False, default=datetime.utcnow)
@@ -54,14 +64,6 @@ class Customer(Base):
 #     id = Column(Integer, primary_key=True, autoincrement=True)
 #     title = Column(String, nullable=False)
 #     key_skill = Column(String)
-#
-#
-# class CreditCard:
-#     __tablename__ = "credit_cards"
-#
-#     id = Column(Integer, primary_key=True, autoincrement=True)
-#     balance = Column(Float, nullable=False)
-#     cc_number = Column(String)
 #
 #
 # class Address:

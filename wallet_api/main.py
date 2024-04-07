@@ -1,4 +1,9 @@
 import logging.config
+import pathlib
+import sys
+
+directory = pathlib.Path(__file__).parent.parent.absolute()
+sys.path.append(str(directory))
 
 from sqlalchemy.ext.asyncio import async_sessionmaker
 from aiohttp import web
@@ -18,8 +23,7 @@ async def teardown_app(app):
     log.info("Loop closed. Exiting...")
 
 app = web.Application()
-app["background"] = Background()
-app["session"] = async_sessionmaker(engine, expire_on_commit=False)
+app["background"] = Background(async_sessionmaker(engine, expire_on_commit=False))
 
 app.add_routes([
     web.post("/transaction", handle_transactions),

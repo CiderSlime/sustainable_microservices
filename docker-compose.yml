@@ -10,3 +10,22 @@ services:
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
       POSTGRES_DB: mydb
+
+#  wallet_api:
+#    build:
+#      context: .
+#      dockerfile: wallet_api/Dockerfile
+#    depends_on:
+#      - postgres
+#      - wallet_processor
+#    ports:
+#      - "8080:8080"
+#
+#  wallet_processor:
+#    build:
+#      context: .
+#      dockerfile: wallet_processor/Dockerfile
+#    depends_on:
+#      - postgres
+#    ports:
+#      - "8081:8081"
