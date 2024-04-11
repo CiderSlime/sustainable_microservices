@@ -81,15 +81,3 @@ async def customers(session_maker):
                 ),
             ])
             return customers_id
-
-
-@pytest.fixture(autouse=True)
-async def preparations(mocker):
-
-    async def fake_stop(self):
-        tasks = self.tasks.values()
-        for t in tasks:
-            t.cancel()
-
-    # cancellation without awaiting result, which is not needed for tests
-    mocker.patch("wallet_api.background.Background.teardown", fake_stop)

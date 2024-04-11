@@ -4,7 +4,6 @@ import logging
 from uuid import uuid4
 
 import aiohttp
-from aiohttp.web_runner import GracefulExit
 
 from alchemy.models import Transaction
 from wallet_api.constants import (
@@ -18,7 +17,6 @@ class Background:
     def __init__(self, session_maker):
         self.session_maker = session_maker
         self.batches = list()
-        self.tasks = dict()
         self.transferring_batches_count = 0
 
     async def add_batches(self, new_batches):
@@ -51,10 +49,3 @@ class Background:
 
         self.transferring_batches_count -= 1
         await self.handle_next_batch()
-
-    async def teardown(self):
-        tasks = self.tasks.values()
-        for t in tasks:
-            t.cancel()
-
-        await asyncio.gather(*tasks)
