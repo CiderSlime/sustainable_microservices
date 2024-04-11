@@ -1,6 +1,5 @@
-import asyncio
-import json
 import logging
+import os
 from uuid import uuid4
 
 import aiohttp
@@ -11,6 +10,8 @@ from wallet_api.constants import (
 )
 
 log = logging.getLogger(__name__)
+
+PROCESSOR_HOST = os.environ.get('PROCESSOR_HOST', 'localhost')
 
 
 class Background:
@@ -31,7 +32,9 @@ class Background:
         self.transferring_batches_count += 1
         log.debug(f"Sending batch {batch}")
         async with aiohttp.ClientSession() as aiohttp_session:
-            async with aiohttp_session.post("http://0.0.0.0:8081/handler", json=batch) as resp:
+            async with aiohttp_session.post(
+                    f"http://{PROCESSOR_HOST}:8081/handler", json=batch
+            ) as resp:
                 transactions = await resp.json(content_type=resp.content_type)
                 log.debug(f"Response data: {transactions}")
 

@@ -1,7 +1,9 @@
+import os
+
 from sqlalchemy.ext.asyncio import create_async_engine
 
-
-DB_STRING = "postgresql+asyncpg://myuser:mypassword@localhost:5432/mydb"
+DB_HOST = os.environ.get('DB_HOST', 'localhost')
+DB_STRING = f"postgresql+asyncpg://myuser:mypassword@{DB_HOST}:5432/mydb"
 
 
 def get_engine():

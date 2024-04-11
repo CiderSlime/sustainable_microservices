@@ -5,10 +5,8 @@ the `wallet_processor` one by one.
 # How to run tests
 - `pip install -r requirements.txt`
 - `pip install -r requirements_tests.txt`
-- `docker-compose up -d` for postgres
-- `alembic upgrade head`
-- `python wallet_api/main.py`, then `python wallet_processor/main.py` or use Pycharm run configuration. Required for integration test.
-- `pytest tests --log-cli-level=DEBUG` for tests, or use similar Pycharm config
+- `make compose_up` for postgres, microservices and migrations
+- `make test` for tests, or use similar Pycharm config
 ### improvement suggestions
 - Consider to use task queue (ex. RabbitMQ) to store chunks, and let the 
 `wallet_processor` to read them from the queue.

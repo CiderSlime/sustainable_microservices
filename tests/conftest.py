@@ -37,9 +37,7 @@ async def processor_client(aiohttp_client):
 @pytest.fixture(scope="session")
 def engine():
     engine = get_engine()
-    yield engine
-
-    engine.dispose()
+    return engine
 
 
 @pytest.fixture(scope="session")

@@ -1,5 +1,4 @@
 import asyncio
-import json
 
 from aiohttp import web
 from alchemy.models import Customer
@@ -25,4 +24,5 @@ async def handle_batch(request):
             else:
                 transaction["status"] = "not enough balance"
 
+    log.debug(f"Handled transactions: {batch['transactions']}")
     return web.json_response(batch["transactions"])
